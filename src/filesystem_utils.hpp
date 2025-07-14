@@ -1,18 +1,12 @@
 #pragma once
 
-#include <windows.h>
-#include <string>
-#include <vector>
-#include <filesystem>
-#include <stdexcept> 
-
-namespace fs = std::filesystem;
+#include "includes.hpp"
 
 class fs_utils
 {
     public:
-        std::vector<std::string> getInstalledBrowsers();
-        std::vector<std::string> getBrowserProfiles(const std::string& browserName);
+        std::vector<std::string> enumerateFolder(REFKNOWNFOLDERID folderId);
+        std::vector<std::string> filterFilesByType(const std::vector<std::string>& files, const std::vector<std::string>& extensions);
 
         std::string GetEnv(const char* varName);
 };

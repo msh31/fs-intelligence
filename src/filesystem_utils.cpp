@@ -1,46 +1,35 @@
 #include "filesystem_utils.hpp"
 
-std::vector<std::string> fs_utils::getInstalledBrowsers()
+std::vector<std::string> fs_utils::enumerateFolder(REFKNOWNFOLDERID folderId)
 {
-    std::vector<std::string> browsers;
+    std::vector<std::string> documentFiles;
 
-    std::string chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-    std::string firefoxPath = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    std::string edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
+    PWSTR path = NULL; //wchar_t string pointer
+    HRESULT hr = SHGetKnownFolderPath(folderId, 0, NULL, &path);
 
-    if (fs::exists(chromePath)) { browsers.emplace_back("Chrome"); }
-    if (fs::exists(firefoxPath)) { browsers.emplace_back("Firefox"); }
-    if (fs::exists(edgePath)) { browsers.emplace_back("Edge"); }
-
-    return browsers;
-}
-
-std::vector<std::string> fs_utils::getBrowserProfiles(const std::string& browserName)
-{
-    std::vector<std::string> profiles;
-    std::string appdata = GetEnv("APPDATA");
-    std::string localAppdata = GetEnv("LOCALAPPDATA");
-
-    if (browserName == "Firefox") {
-        std::string profilesRoot = appdata + "\\Mozilla\\Firefox\\Profiles";
-
-        if (fs::exists(profilesRoot) && fs::is_directory(profilesRoot)) {
-            for (const auto& entry : fs::directory_iterator(profilesRoot)) {
-                if (fs::is_directory(entry.path())) {
-                    profiles.emplace_back(entry.path().string());
-                }
-            }
-        }
-    }
-    else if (browserName == "Edge") {
-        std::string edgeProfile = localAppdata + "\\Microsoft\\Edge\\User Data\\Default";
-
-        if (fs::exists(edgeProfile) && fs::is_directory(edgeProfile)) {
-            profiles.emplace_back(edgeProfile);
-        }
+    if (!SUCCEEDED(hr)) {
+        std::cerr << "Failed to get folder path. HRESULT: " << hr << "\n";
+        return documentFiles;
     }
 
-    return profiles;
+    try {
+        fs::path documentsPath = fs::path(path);
+
+        CoTaskMemFree(path);
+
+        if (!fs::exists(documentsPath) || !fs::is_directory(documentsPath)) {
+            throw std::runtime_error("Folder path is invalid or not a directory.");
+        }
+
+        for (const auto& entry : fs::directory_iterator(documentsPath)) {
+            documentFiles.push_back(entry.path().string());
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error enumerating folder path: " << e.what() << "\n";
+    }
+
+    return documentFiles;
 }
 
 std::string fs_utils::GetEnv(const char* varName)
@@ -54,4 +43,15 @@ std::string fs_utils::GetEnv(const char* varName)
     value.resize(size - 1);
 
     return value;
+}
+
+std::vector<std::string> fs_utils::filterFilesByType(const std::vector<std::string>& files, const std::vector<std::string>& extensions)
+{
+    std::vector<std::string> filteredFiles;
+
+    // TODO: loop through files
+    // extract extension from each file
+    // cvheck if extension matches any in the extensions list
+
+    return filteredFiles;
 }
