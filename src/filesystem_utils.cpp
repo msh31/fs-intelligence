@@ -86,6 +86,7 @@ fs_utils::DocumentsReport fs_utils::generateDocumentsReport()
     report.valuableDesktopCount = valuableDesktop.size();
     report.valuableDownloadsCount = valuableDownloads.size();
     report.valuableDocumentsCount = valuableDocuments.size();
+
     report.totalValuables = report.valuableDesktopCount + report.valuableDownloadsCount + report.valuableDocumentsCount;
 
     return report;
