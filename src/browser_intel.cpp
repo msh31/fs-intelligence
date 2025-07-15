@@ -1,7 +1,4 @@
 #include "browser_intel.hpp"
-#include "filesystem_utils.hpp"
-
-fs_utils fsUtils;
 
 std::vector<std::string> browser_intel::getInstalledBrowsers()
 {
@@ -21,8 +18,8 @@ std::vector<std::string> browser_intel::getInstalledBrowsers()
 std::vector<std::string> browser_intel::getBrowserProfiles(const std::string& browserName)
 {
     std::vector<std::string> profiles;
-    std::string appdata = fsUtils.GetEnv("APPDATA");
-    std::string localAppdata = fsUtils.GetEnv("LOCALAPPDATA");
+    std::string appdata = this->fsUtils.GetEnv("APPDATA");
+    std::string localAppdata = this->fsUtils.GetEnv("LOCALAPPDATA");
 
     if (browserName == "Firefox") {
         std::string profilesRoot = appdata + "\\Mozilla\\Firefox\\Profiles";
@@ -84,4 +81,21 @@ std::vector<std::string> browser_intel::getBrowserDataFiles(const std::string& p
     }
 
     return dataFiles;
+}
+
+browser_intel::BrowserReport browser_intel::generateBrowserReport()
+{
+    std::vector<std::string> browsers = getInstalledBrowsers();
+    BrowserReport report;
+
+    for (const auto& browser : browsers) {
+        std::vector<std::string> profiles = getBrowserProfiles(browser);
+
+        for (const auto& profile : profiles) {
+            std::vector<std::string> dataFiles = getBrowserDataFiles(profile, browser);
+            report.credentialFiles += dataFiles.size();  // Add count to total
+        }
+    }
+
+    return report;
 }

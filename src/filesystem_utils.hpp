@@ -5,8 +5,18 @@
 class fs_utils
 {
     public:
-        std::vector<std::string> enumerateFolder(REFKNOWNFOLDERID folderId);
-        std::vector<std::string> filterFilesByType(const std::vector<std::string>& files, const std::vector<std::string>& extensions);
+        struct DocumentsReport {
+            int valuableDesktopCount = 0;
+            int valuableDownloadsCount = 0;
+            int valuableDocumentsCount = 0;
+            int totalValuables = 0;
+        };
+
+        DocumentsReport generateDocumentsReport();
 
         std::string GetEnv(const char* varName);
+
+    private:
+        std::vector<std::string> enumerateFolder(REFKNOWNFOLDERID folderId);
+        std::vector<std::string> filterFilesByType(const std::vector<std::string>& files, const std::vector<std::string>& extensions);
 };

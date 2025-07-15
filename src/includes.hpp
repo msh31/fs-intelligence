@@ -5,5 +5,7 @@
 #include <filesystem>
 #include <stdexcept> 
 #include <shlobj.h>     // For SHGetKnownFolderPath
+#include <algorithm>  // For std::transform
+#include <cctype>     // For ::tolower
 
 namespace fs = std::filesystem;

@@ -49,9 +49,44 @@ std::vector<std::string> fs_utils::filterFilesByType(const std::vector<std::stri
 {
     std::vector<std::string> filteredFiles;
 
-    // TODO: loop through files
-    // extract extension from each file
-    // cvheck if extension matches any in the extensions list
+    for (const auto& file : files) {
+        fs::path filePath = file;
+        std::string extension = filePath.extension().string();
+
+        std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+        for (const auto& targetExt : extensions) {
+            std::string lowerTargetExt = targetExt;
+            std::transform(lowerTargetExt.begin(), lowerTargetExt.end(), lowerTargetExt.begin(), ::tolower);
+
+            if (extension == lowerTargetExt) {
+                filteredFiles.push_back(file);
+                break;
+            }
+        }
+    }
 
     return filteredFiles;
+}
+
+fs_utils::DocumentsReport fs_utils::generateDocumentsReport()
+{
+    std::vector<std::string> valuableExtensions = { ".docx", ".pdf", ".txt", ".xlsx", ".pptx", ".zip" };
+
+    std::vector<std::string> documents = enumerateFolder(FOLDERID_Documents);
+    std::vector<std::string> desktop = enumerateFolder(FOLDERID_Desktop);
+    std::vector<std::string> downloads = enumerateFolder(FOLDERID_Downloads);
+
+    std::vector<std::string> valuableDocuments = filterFilesByType(documents, valuableExtensions);
+    std::vector<std::string> valuableDesktop = filterFilesByType(desktop, valuableExtensions);
+    std::vector<std::string> valuableDownloads = filterFilesByType(downloads, valuableExtensions);
+
+    DocumentsReport report;
+
+    report.valuableDesktopCount = valuableDesktop.size();
+    report.valuableDownloadsCount = valuableDownloads.size();
+    report.valuableDocumentsCount = valuableDocuments.size();
+    report.totalValuables = report.valuableDesktopCount + report.valuableDownloadsCount + report.valuableDocumentsCount;
+
+    return report;
 }

@@ -123,6 +123,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="browser_intel.hpp" />
     <ClInclude Include="filesystem_utils.hpp" />
+    <ClInclude Include="includes.hpp" />
     <ClInclude Include="software_enum.hpp" />
     <ClInclude Include="target_profile.hpp" />
   </ItemGroup>
