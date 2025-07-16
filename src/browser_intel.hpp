@@ -7,9 +7,11 @@ class browser_intel
 {
     public:
         struct BrowserReport {
-            //int totalBrowsers;
-            //int totalProfiles;
+            std::vector<std::string> browsersFound = {};
+
+            int totalProfiles = 0;
             int credentialFiles = 0;
+            int financialSites = 0;
         };
 
         BrowserReport generateBrowserReport();

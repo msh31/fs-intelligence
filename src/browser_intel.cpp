@@ -85,16 +85,24 @@ std::vector<std::string> browser_intel::getBrowserDataFiles(const std::string& p
 
 browser_intel::BrowserReport browser_intel::generateBrowserReport()
 {
-    std::vector<std::string> browsers = getInstalledBrowsers();
     BrowserReport report;
+    std::vector<std::string> browsers = getInstalledBrowsers();
+
+    report.browsersFound = browsers;
 
     for (const auto& browser : browsers) {
         std::vector<std::string> profiles = getBrowserProfiles(browser);
 
+        report.totalProfiles += profiles.size();
+
         for (const auto& profile : profiles) {
             std::vector<std::string> dataFiles = getBrowserDataFiles(profile, browser);
-            report.credentialFiles += dataFiles.size();  // Add count to total
+            report.credentialFiles += dataFiles.size();
         }
+    }
+
+    if (report.credentialFiles > 0) {
+        report.financialSites = (report.browsersFound.size() * 2) + 1;  // mockup for now
     }
 
     return report;
